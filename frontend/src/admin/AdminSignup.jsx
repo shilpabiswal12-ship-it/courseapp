@@ -1,158 +1,269 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import axios from "axios";
-import logo from "../../public/logo.jpg";
 import { Link, useNavigate } from "react-router-dom";
-import toast from 'react-hot-toast';
-import { BACKEND_URL } from "../utils/utils";
+import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiMail, FiLock, FiEye, FiEyeOff, FiUser } from "react-icons/fi";
 
-function AdminSignup () {
+// ── Floating particles ────────────────────────────────────────────────────────
+const particles = Array.from({ length: 20 }, () => ({
+  width: Math.random() * 10 + 4,
+  height: Math.random() * 10 + 4,
+  top: `${Math.random() * 100}%`,
+  left: `${Math.random() * 100}%`,
+  duration: Math.random() * 5 + 3,
+  delay: Math.random() * 4,
+}));
 
-  const [firstname,setFirstName] = useState("")
-  const [lastname,setLastName] = useState("")
-  const [email,setEmail] = useState("")
-  const [password,setPassword] = useState("")
+function Particle({ style }) {
+  return (
+    <motion.span
+      className="absolute rounded-full bg-blue-400 opacity-20 pointer-events-none"
+      style={{ width: style.width, height: style.height, top: style.top, left: style.left }}
+      animate={{ y: [0, -28, 0], opacity: [0.12, 0.3, 0.12], scale: [1, 1.3, 1] }}
+      transition={{ duration: style.duration, repeat: Infinity, delay: style.delay, ease: "easeInOut" }}
+    />
+  );
+}
+
+// ── Variants ──────────────────────────────────────────────────────────────────
+const cardVariant = {
+  hidden: { opacity: 0, y: 60, scale: 0.95 },
+  visible: {
+    opacity: 1, y: 0, scale: 1,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+  },
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.09 } },
+};
+
+const fieldVariant = {
+  hidden: { opacity: 0, x: -24 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.45, ease: "easeOut" } },
+};
+
+// ── Component ─────────────────────────────────────────────────────────────────
+function AdminSignup() {
+  const [firstname, setFirstName] = useState("");
+  const [lastname, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try{
-    const response = await axios.post(
-  "http://localhost:4001/api/v1/admin/signup",
-  {
-    firstName: firstname,
-    lastName: lastname,
-    email,
-    password,
-  },
-  {
-    withCredentials: true,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }
-);
-      console.log("Signup successful: ",response.data)
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:4001/api/v1/admin/signup",
+        { firstName: firstname, lastName: lastname, email, password },
+        { withCredentials: true, headers: { "Content-Type": "application/json" } }
+      );
       toast.success(response.data.message);
       navigate("/admin/login");
     } catch (error) {
-     if (error.response) {
-  console.log("BACKEND ERROR:", error.response.data); 
-  setErrorMessage(error.response.data.errors || "Signup failed!!!");
-  alert(error.response.data.errors)
-}
-
+      if (error.response) {
+        setErrorMessage(error.response.data.errors || "Signup failed!");
+        toast.error(error.response.data.errors || "Signup failed!");
+      }
+    } finally {
+      setLoading(false);
     }
-
   };
-      
-    
+
   return (
-  <div className='bg-gradient-to-r from-black to-blue-950'>
-    <div className="h-screen container mx-auto flex items-center justify-center text-white"> 
-      <header className="absolute top-0 left-0 w-full flex justify-between items-center p-5 ">
-        <div className="flex items-center space-x-2">
-          <img src={logo} alt="logo" className="w-12 h-12 rounded-full" />
-          <Link to={"/"} className="text-xl font-bold text-orange-500">
-          CourseHive
-          </Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link to={"/admin/login"}
-            className="bg-transparent border border-gray-500 py-2 px-4 rounded-md">
-              Login
-            </Link>
-            <Link to={"/courses"}
-                  className="bg-orange-500 py-2 px-4 rounded-md">
-                    Join Now
-                  </Link>
-          </div>
-        </header>
-        <div className="bg-gray-900 p-8 rounded-lg shadow-lg w-[500px] mt-20">
-          <h2 className="text-2xl font-bold mb-4 text-center ">
-            Welcome to <span className="text-orange-500"> CourseHive</span>
-          </h2> 
-          <p className="text-center text-gray-400 mb-6">
-            Just Signup to mess with dashboard !
-          </p>
+    <div className="bg-[#020617] min-h-screen relative overflow-hidden">
 
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label htmlFor="firstname" className=" text-gray-400 mb-2">
-                Firstname
-              </label>
-              <input 
-              type="text"
-              id="firstname"
-              value={firstname}
-              onChange={(e)=>setFirstName(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500"
-              placeholder="Type Your Firstname" />
-            </div>
-              <div className="mb-4">
-              <label htmlFor="lastname" className=" text-gray-400 mb-2">
-                Lastname
-              </label>
-              <input 
-              type="text"
-              id="lastname"
-              value={lastname}
-              onChange={(e)=>setLastName(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500"
-              placeholder="Type Your Lastname" 
-              required/>
-            </div>
-              <div className="mb-4">
-              <label htmlFor="email" className=" text-gray-400 mb-2">
-                Email
-              </label>
-              <input 
-              type="text"
-              id="email"
-              value={email}
-              onChange={(e)=>setEmail(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500"
-              placeholder="name@email.com" 
-              required />
-            </div>
-              <div className="mb-4">
-              <label htmlFor="password" className=" text-gray-400 mb-2">
-                Password
-              </label>
-                <div className="relative">
-              <input 
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e)=>setPassword(e.target.value)}
-              className="w-full p-3 rounded-md bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500"
-              placeholder="********" 
-              required />
-              <span className="absolute right-3 top-3 text-gray-500 cursor-pointer">
-              👁️
-              </span>
-            </div>
-            </div>
-             {errorMessage && (
-              <div className="mb-4 text-red-500 text-center">
-                {errorMessage}
+      {/* Particles */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {particles.map((p, i) => <Particle key={i} style={p} />)}
+      </div>
+
+      {/* Radial glow */}
+      <div className="absolute inset-0 pointer-events-none z-0"
+        style={{ background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(59,130,246,0.12) 0%, transparent 70%)" }}
+      />
+
+      {/* ── Header ── */}
+      <motion.header
+        className="absolute top-0 left-0 w-full flex justify-between items-center px-8 py-5 z-20"
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <Link to="/">
+          <motion.div className="flex items-center cursor-pointer select-none" whileHover={{ scale: 1.05 }}>
+            <span className="text-2xl font-black tracking-tight text-white"
+              style={{ fontFamily: "'Inter','Segoe UI',sans-serif", letterSpacing: "-0.5px" }}>
+              Course
+            </span>
+            <motion.span className="text-2xl font-black tracking-tight text-orange-500"
+              style={{ fontFamily: "'Inter','Segoe UI',sans-serif", letterSpacing: "-0.5px" }}
+              animate={{ filter: ["drop-shadow(0 0 4px rgba(249,115,22,0.3))", "drop-shadow(0 0 14px rgba(249,115,22,0.9))", "drop-shadow(0 0 4px rgba(249,115,22,0.3))"] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
+              Hive
+            </motion.span>
+          </motion.div>
+        </Link>
+
+        <motion.div className="flex items-center space-x-3"
+          initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}>
+          {[
+            { to: "/admin/login", label: "Login", outline: true },
+            { to: "/courses", label: "Join Now", outline: false },
+          ].map(({ to, label, outline }) => (
+            <motion.span key={label} whileHover={{ scale: 1.07 }} whileTap={{ scale: 0.95 }}
+              style={{ display: "inline-block" }}>
+              <Link to={to}
+                className={`py-2 px-5 rounded-md text-sm font-semibold transition-colors duration-300 ${outline
+                  ? "border border-gray-500 text-white hover:border-orange-400 hover:text-orange-400"
+                  : "bg-orange-500 text-white hover:bg-orange-600"
+                  }`}>
+                {label}
+              </Link>
+            </motion.span>
+          ))}
+        </motion.div>
+      </motion.header>
+
+      {/* ── Signup Card ── */}
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-24">
+        <motion.div className="w-full max-w-md" variants={cardVariant} initial="hidden" animate="visible">
+
+          {/* Glowing border */}
+          <div className="relative rounded-2xl p-[1.5px]"
+            style={{ background: "linear-gradient(135deg, rgba(249,115,22,0.6), rgba(59,130,246,0.4), rgba(249,115,22,0.2))" }}>
+            <div className="bg-gray-950 bg-opacity-90 rounded-2xl p-8 backdrop-blur-sm">
+
+              {/* Title */}
+              <div className="text-center mb-7">
+                <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}>
+                  <motion.div
+                    className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-3xl"
+                    style={{ background: "linear-gradient(135deg, rgba(249,115,22,0.2), rgba(59,130,246,0.2))", border: "1px solid rgba(249,115,22,0.3)" }}
+                    animate={{ boxShadow: ["0 0 0px rgba(249,115,22,0)", "0 0 20px rgba(249,115,22,0.4)", "0 0 0px rgba(249,115,22,0)"] }}
+                    transition={{ duration: 2.5, repeat: Infinity }}>
+                    🚀
+                  </motion.div>
+
+                  <h2 className="text-2xl font-extrabold text-white">
+                    Join{" "}
+                    <motion.span className="text-orange-500"
+                      animate={{ filter: ["drop-shadow(0 0 4px rgba(249,115,22,0.3))", "drop-shadow(0 0 16px rgba(249,115,22,0.8))", "drop-shadow(0 0 4px rgba(249,115,22,0.3))"] }}
+                      transition={{ duration: 2.5, repeat: Infinity }}>
+                      CourseHive
+                    </motion.span>
+                  </h2>
+                  <p className="text-gray-400 mt-2 text-sm">Create your Admin account to get started</p>
+
+                  <motion.div className="flex justify-center mt-3">
+                    <motion.div className="h-0.5 rounded-full bg-gradient-to-r from-orange-500 via-blue-400 to-orange-500"
+                      initial={{ width: 0 }} animate={{ width: "140px" }}
+                      transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }} />
+                  </motion.div>
+                </motion.div>
               </div>
-            )
 
-            }
-          
-            <button type="Submit"
-            className="w-full bg-orange-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md transition">
-              Signup
-            </button>
-             </form>
-        </div>
+              {/* Form */}
+              <motion.form onSubmit={handleSubmit} variants={stagger} initial="hidden" animate="visible">
 
+                {/* First & Last name row */}
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: "First Name", value: firstname, setter: setFirstName, placeholder: "John", id: "firstname" },
+                    { label: "Last Name", value: lastname, setter: setLastName, placeholder: "Doe", id: "lastname" },
+                  ].map(({ label, value, setter, placeholder, id }) => (
+                    <motion.div key={id} className="mb-4" variants={fieldVariant}>
+                      <label className="text-gray-400 text-sm mb-1 block">{label}</label>
+                      <div className="relative">
+                        <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                        <input type="text" id={id} value={value}
+                          onChange={(e) => setter(e.target.value)}
+                          className="w-full pl-9 pr-3 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors duration-300 text-sm"
+                          placeholder={placeholder} required />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Email */}
+                <motion.div className="mb-4" variants={fieldVariant}>
+                  <label className="text-gray-400 text-sm mb-1 block">Email</label>
+                  <div className="relative">
+                    <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg" />
+                    <input type="text" value={email} onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors duration-300"
+                      placeholder="name@email.com" required />
+                  </div>
+                </motion.div>
+
+                {/* Password */}
+                <motion.div className="mb-5" variants={fieldVariant}>
+                  <label className="text-gray-400 text-sm mb-1 block">Password</label>
+                  <div className="relative">
+                    <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg" />
+                    <input type={showPassword ? "text" : "password"} value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-10 pr-12 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors duration-300"
+                      placeholder="••••••••" required />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-orange-400 transition-colors duration-200">
+                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
+                </motion.div>
+
+                {/* Error */}
+                <AnimatePresence>
+                  {errorMessage && (
+                    <motion.div
+                      className="mb-4 text-red-400 text-sm text-center bg-red-900/20 border border-red-800/40 rounded-lg py-2"
+                      initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
+                      {errorMessage}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Submit */}
+                <motion.div variants={fieldVariant}>
+                  <motion.button type="submit" disabled={loading}
+                    className="w-full py-3 rounded-xl font-bold text-white text-base"
+                    style={{ background: "linear-gradient(135deg, #f97316, #ea580c)" }}
+                    whileHover={{ scale: 1.02, boxShadow: "0 0 24px rgba(249,115,22,0.5)" }}
+                    whileTap={{ scale: 0.97 }}
+                    animate={{ boxShadow: ["0 0 0px rgba(249,115,22,0)", "0 0 18px rgba(249,115,22,0.4)", "0 0 0px rgba(249,115,22,0)"] }}
+                    transition={{ duration: 2.5, repeat: Infinity }}>
+                    {loading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <motion.span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full inline-block"
+                          animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }} />
+                        Creating account…
+                      </span>
+                    ) : "Create Account"}
+                  </motion.button>
+                </motion.div>
+
+                <motion.p className="text-center text-gray-500 text-sm mt-5" variants={fieldVariant}>
+                  Already have an account?{" "}
+                  <Link to="/admin/login" className="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
+                    Login
+                  </Link>
+                </motion.p>
+              </motion.form>
+
+            </div>
+          </div>
+        </motion.div>
+      </div>
     </div>
-
-  </div>
   );
 }
 
