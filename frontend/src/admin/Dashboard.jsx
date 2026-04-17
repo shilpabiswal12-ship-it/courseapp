@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from "../../public/logo.jpg";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   FiGrid, FiPlusSquare, FiHome, FiLogOut, FiBook,
-  FiUsers, FiTrendingUp, FiAward,
+  FiUsers, FiTrendingUp, FiAward, FiArrowRight
 } from "react-icons/fi";
 
 // ── Typewriter hook ───────────────────────────────────────────────────────────
@@ -41,27 +41,19 @@ function Counter({ to, duration = 1.5 }) {
   return <span>{count.toLocaleString()}</span>;
 }
 
-// ── Nav items ─────────────────────────────────────────────────────────────────
-const navItems = [
-  { to: "/admin/our-courses", label: "Our Courses", Icon: FiGrid, color: "#22c55e" },
-  { to: "/admin/create-course", label: "Create Course", Icon: FiPlusSquare, color: "#f97316" },
-  { to: "/", label: "Home", Icon: FiHome, color: "#3b82f6" },
-];
-
-// ── Stat cards ────────────────────────────────────────────────────────────────
+// ── Stat cards data ──
 const stats = [
-  { label: "Total Courses", value: 12, Icon: FiBook, gradient: "from-orange-500 to-amber-400" },
-  { label: "Total Students", value: 340, Icon: FiUsers, gradient: "from-blue-500  to-cyan-400" },
-  { label: "Revenue (₹)", value: 48200, Icon: FiTrendingUp, gradient: "from-green-500 to-emerald-400" },
-  { label: "Certifications", value: 198, Icon: FiAward, gradient: "from-purple-500 to-pink-400" },
+  { label: "TOTAL COURSES", value: 12, Icon: FiBook, gradient: "from-orange-500 to-amber-500 shadow-orange-500/30" },
+  { label: "TOTAL STUDENTS", value: 340, Icon: FiUsers, gradient: "from-sky-400 to-blue-600 shadow-blue-500/30" },
+  { label: "REVENUE (₹)", value: 48200, Icon: FiTrendingUp, gradient: "from-emerald-400 to-green-600 shadow-emerald-500/30" },
+  { label: "CERTIFICATIONS", value: 198, Icon: FiAward, gradient: "from-fuchsia-500 to-purple-600 shadow-purple-500/30" },
 ];
 
-// ── Component ─────────────────────────────────────────────────────────────────
 function Dashboard() {
   const navigate = useNavigate();
   const adminStr = localStorage.getItem("admin");
   const admin = adminStr && adminStr !== "undefined" ? JSON.parse(adminStr) : null;
-  const [activeNav, setActiveNav] = useState(null);
+  const [activeNav, setActiveNav] = useState("/admin/dashboard");
 
   useEffect(() => { if (!admin) navigate("/admin/login"); }, [admin, navigate]);
   if (!admin) return null;
@@ -82,263 +74,154 @@ function Dashboard() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#020617] text-white">
-
-      {/* ══ SIDEBAR ══════════════════════════════════════════════════════════ */}
-      <motion.aside
-        className="relative flex flex-col w-64 shrink-0 overflow-hidden"
-        style={{
-          background: "linear-gradient(180deg, #0f172a 0%, #020617 100%)",
-          borderRight: "1px solid rgba(255,255,255,0.06)",
-        }}
-        initial={{ x: -260 }}
-        animate={{ x: 0 }}
-        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      
+      {/* ══ SIDEBAR (Matches Image 2 Style) ═══════════════════════════════════ */}
+      <motion.aside 
+        className="w-72 border-r border-white/5 bg-[#0f172a]/50 backdrop-blur-2xl flex flex-col z-20"
+        initial={{ x: -100 }} animate={{ x: 0 }}
       >
-        {/* Sidebar glow blob */}
-        <div className="absolute -top-16 -left-16 w-48 h-48 rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%)" }} />
-
-        {/* Profile */}
-        <div className="flex flex-col items-center pt-10 pb-8 px-6">
-          <motion.div
-            className="relative"
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.7, delay: 0.3, type: "spring", stiffness: 200 }}
-          >
-            <img src={logo} alt="Admin"
-              className="w-20 h-20 rounded-2xl object-cover"
-              style={{ border: "2px solid rgba(139,92,246,0.6)", boxShadow: "0 0 20px rgba(139,92,246,0.4)" }}
-            />
-            {/* Online dot */}
-            <motion.span
-              className="absolute bottom-1 right-1 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-gray-900"
-              animate={{ scale: [1, 1.4, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            />
+        <div className="flex flex-col items-center pt-12 pb-10">
+          <motion.div className="relative mb-6" whileHover={{ scale: 1.05 }}>
+            {/* Logo with glow */}
+            <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
+            <img src={logo} alt="Logo" className="w-20 h-20 rounded-2xl object-contain shadow-2xl border-4 border-white/10 relative z-10" />
+            <span className="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 border-4 border-[#020617] rounded-full z-20" />
           </motion.div>
-
-          <motion.div className="text-center mt-4"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55, duration: 0.45 }}
-          >
-            <p className="text-xs text-purple-400 font-semibold uppercase tracking-widest mb-1">Administrator</p>
-            <h2 className="text-base font-bold text-white">
+          
+          <div className="text-center relative z-10">
+            <p className="text-[10px] text-purple-400 font-extrabold uppercase tracking-[0.2em] mb-1">Administrator</p>
+            <h2 className="text-xl font-black text-white tracking-tight">
               {admin.firstName} {admin.lastName}
             </h2>
-          </motion.div>
+          </div>
         </div>
 
-        {/* Divider */}
-        <motion.div className="mx-6 mb-6 h-px bg-gradient-to-r from-transparent via-purple-700 to-transparent"
-          initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }} />
-
-        {/* Nav */}
-        <nav className="flex flex-col gap-2 px-4 flex-1">
-          {navItems.map(({ to, label, Icon, color }, i) => (
-            <motion.div key={to}
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.35 + i * 0.1, duration: 0.4, ease: "easeOut" }}
-            >
-              <Link to={to} onClick={() => setActiveNav(to)}>
-                <motion.div
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer relative overflow-hidden"
-                  style={{
-                    background: activeNav === to
-                      ? `linear-gradient(135deg, ${color}22, ${color}11)`
-                      : "transparent",
-                    border: activeNav === to
-                      ? `1px solid ${color}44`
-                      : "1px solid transparent",
-                  }}
-                  whileHover={{
-                    x: 6,
-                    background: `linear-gradient(135deg, ${color}22, ${color}11)`,
-                    border: `1px solid ${color}44`,
-                  }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Icon style={{ color }} className="text-lg shrink-0" />
-                  <span className="text-sm font-medium text-gray-200">{label}</span>
-
-                  {/* Hover shimmer */}
-                  <motion.div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{ background: `linear-gradient(90deg, transparent, ${color}18, transparent)` }}
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: "100%" }}
-                    transition={{ duration: 0.5 }}
-                  />
-                </motion.div>
-              </Link>
-            </motion.div>
+        <nav className="flex-1 px-8 space-y-3 mt-4">
+          {[
+            { to: "/admin/our-courses", label: "Our Courses", Icon: FiGrid },
+            { to: "/admin/create-course", label: "Create Course", Icon: FiPlusSquare },
+            { to: "/", label: "Home", Icon: FiHome },
+          ].map(({ to, label, Icon }) => (
+            <Link key={to} to={to} onClick={() => setActiveNav(to)}>
+              <motion.div 
+                className={`flex items-center gap-4 px-6 py-4 rounded-xl cursor-pointer transition-all ${
+                  activeNav === to ? "bg-white/10 text-white border border-white/10 shadow-lg" : "text-gray-400 hover:bg-white/5 hover:text-white"
+                }`}
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Icon className={`text-xl ${activeNav === to ? "text-orange-500" : "text-gray-500"}`} />
+                <span className="text-base font-bold tracking-tight">{label}</span>
+              </motion.div>
+            </Link>
           ))}
         </nav>
 
-        {/* Logout */}
-        <div className="px-4 pb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.75, duration: 0.4 }}
+        <div className="p-8">
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-5 py-4 rounded-xl text-sm font-bold text-red-400 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 transition-all"
           >
-            <motion.button
-              onClick={handleLogout}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-red-400 relative overflow-hidden"
-              style={{ border: "1px solid rgba(239,68,68,0.2)" }}
-              whileHover={{
-                background: "rgba(239,68,68,0.1)",
-                border: "1px solid rgba(239,68,68,0.4)",
-                x: 6,
-              }}
-              whileTap={{ scale: 0.96 }}
-              transition={{ duration: 0.2 }}
-            >
-              <FiLogOut className="text-lg" />
-              Logout
-            </motion.button>
-          </motion.div>
+            <FiLogOut className="text-lg" />
+            Logout
+          </button>
         </div>
       </motion.aside>
 
       {/* ══ MAIN CONTENT ═════════════════════════════════════════════════════ */}
-      <main className="flex-1 overflow-y-auto"
-        style={{ background: "#020617" }}>
-
-        {/* Top bar */}
-        <motion.div
-          className="flex items-center justify-between px-10 py-6 sticky top-0 z-10"
-          style={{
-            background: "rgba(2,6,23,0.8)",
-            backdropFilter: "blur(12px)",
-            borderBottom: "1px solid rgba(255,255,255,0.05)",
-          }}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
+      <main className="flex-1 overflow-y-auto relative bg-[#020617]">
+        {/* Ambient Glows */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[140px] pointer-events-none" />
+        
+        {/* Header (Matching Image 2 Layout) */}
+        <header className="flex items-center justify-between px-12 py-10 relative z-10">
           <div>
-            <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Admin Panel</p>
+            <p className="text-[10px] text-gray-500 font-extrabold uppercase tracking-[0.2em] mb-1">ADMIN PANEL</p>
             <div className="flex items-center gap-1">
-              <span className="text-2xl font-black tracking-tight text-white"
-                style={{ fontFamily: "'Inter','Segoe UI',sans-serif" }}>Course</span>
-              <motion.span className="text-2xl font-black tracking-tight text-orange-500"
-                style={{ fontFamily: "'Inter','Segoe UI',sans-serif" }}
-                animate={{ filter: ["drop-shadow(0 0 4px rgba(249,115,22,0.3))", "drop-shadow(0 0 14px rgba(249,115,22,0.9))", "drop-shadow(0 0 4px rgba(249,115,22,0.3))"] }}
-                transition={{ duration: 2.5, repeat: Infinity }}>Hive</motion.span>
+              <span className="text-3xl font-black text-white tracking-tighter">Course</span>
+              <span className="text-3xl font-black text-orange-500 tracking-tighter shadow-orange-500/20">Hive</span>
             </div>
           </div>
 
-          {/* Live clock */}
           <LiveClock />
-        </motion.div>
+        </header>
 
-        {/* Body */}
-        <div className="px-10 py-8">
-
-          {/* Typewriter greeting */}
-          <motion.div className="mb-10"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
-            <h1 className="text-3xl font-extrabold text-white min-h-[2.5rem]">
+        <div className="px-12 pb-12 relative z-10">
+          {/* Greeting with Typewriter */}
+          <div className="mb-14">
+            <h1 className="text-5xl font-black text-white tracking-tight flex items-baseline gap-2 min-h-[1.2em]">
               {greeting}
-              <motion.span
-                className="inline-block w-0.5 h-7 bg-orange-500 ml-1 align-middle"
-                animate={{ opacity: [1, 0] }}
-                transition={{ duration: 0.6, repeat: Infinity }}
+              <motion.span 
+                className="w-1.5 h-12 bg-orange-500 inline-block align-middle ml-2"
+                animate={{ opacity: [1, 0, 1] }}
+                transition={{ duration: 0.8, repeat: Infinity }}
               />
             </h1>
-            <p className="text-gray-400 mt-2 text-sm">Here's what's happening in your dashboard today.</p>
-          </motion.div>
+            <p className="text-gray-400 mt-2 text-lg font-medium opacity-80">Here's what's happening in your dashboard today.</p>
+          </div>
 
-          {/* Stat cards */}
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-5 mb-10">
-            {stats.map(({ label, value, Icon, gradient }, i) => (
-              <motion.div key={label}
-                className={`relative rounded-2xl p-6 overflow-hidden bg-gradient-to-br ${gradient}`}
-                initial={{ opacity: 0, y: 40, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: 0.7 + i * 0.12, duration: 0.5, type: "spring", stiffness: 200 }}
-                whileHover={{ y: -6, boxShadow: "0 20px 40px rgba(0,0,0,0.4)" }}
+          {/* Stat Cards (Matching Image 2 Solid Gradients) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {stats.map(({ label, value, Icon, gradient }) => (
+              <motion.div 
+                key={label}
+                className={`relative rounded-3xl p-6 text-white overflow-hidden shadow-2xl bg-gradient-to-br ${gradient}`}
+                whileHover={{ y: -8, scale: 1.02 }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
               >
-                {/* big faded icon background */}
-                <Icon className="absolute -right-4 -bottom-4 text-8xl opacity-10 text-white" />
-
-                <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-2">{label}</p>
-                <p className="text-3xl font-extrabold text-white">
-                  <Counter to={value} />
-                </p>
-
-                {/* shimmer sweep */}
-                <motion.div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{ background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.12) 50%, transparent 60%)" }}
-                  initial={{ x: "-100%" }}
-                  animate={{ x: "200%" }}
-                  transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.4, ease: "linear" }}
-                />
+                <div className="flex flex-col relative z-10">
+                  <p className="text-[10px] font-black opacity-80 uppercase tracking-widest mb-3">{label}</p>
+                  <span className="text-4xl font-black tracking-tighter">
+                    <Counter to={value} />
+                  </span>
+                </div>
+                {/* Large Background Icon */}
+                <Icon className="absolute -right-6 -bottom-6 text-[8rem] opacity-10 rotate-12" />
               </motion.div>
             ))}
           </div>
 
-          {/* Quick action cards */}
-          <motion.h2 className="text-gray-400 text-xs font-semibold uppercase tracking-widest mb-4"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }}>
-            Quick Actions
-          </motion.h2>
+          {/* Quick Actions (Matching Image 2 structure) */}
+          <div className="mb-8">
+            <p className="text-[10px] text-gray-500 font-extrabold uppercase tracking-[0.2em]">QUICK ACTIONS</p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {[
               {
                 to: "/admin/our-courses",
                 title: "Manage Courses",
                 desc: "View, edit and delete your existing courses.",
                 icon: "📚",
-                color: "#22c55e",
+                color: "#22c55e"
               },
               {
                 to: "/admin/create-course",
                 title: "Create New Course",
                 desc: "Publish a brand-new course for your students.",
                 icon: "✨",
-                color: "#f97316",
-              },
-            ].map(({ to, title, desc, icon, color }, i) => (
-              <motion.div key={to}
-                initial={{ opacity: 0, x: i === 0 ? -40 : 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.2 + i * 0.15, duration: 0.5, ease: "easeOut" }}
-                whileHover={{ y: -4, boxShadow: `0 16px 40px ${color}22` }}
-              >
-                <Link to={to}>
-                  <div className="rounded-2xl p-6 cursor-pointer relative overflow-hidden"
-                    style={{
-                      background: "rgba(255,255,255,0.03)",
-                      border: `1px solid ${color}33`,
-                    }}>
-                    <div className="text-4xl mb-3">{icon}</div>
-                    <h3 className="text-white font-bold text-lg mb-1">{title}</h3>
-                    <p className="text-gray-400 text-sm">{desc}</p>
-
-                    {/* Arrow */}
-                    <motion.div
-                      className="absolute right-5 top-1/2 -translate-y-1/2 text-2xl"
-                      style={{ color }}
-                      animate={{ x: [0, 6, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      →
-                    </motion.div>
-
-                    {/* corner glow */}
-                    <div className="absolute -bottom-6 -right-6 w-24 h-24 rounded-full pointer-events-none"
-                      style={{ background: `radial-gradient(circle, ${color}22 0%, transparent 70%)` }} />
+                color: "#f97316"
+              }
+            ].map(({ to, title, desc, icon, color }) => (
+              <Link key={to} to={to}>
+                <motion.div 
+                  className="bg-[#0f172a]/30 backdrop-blur-md rounded-[2rem] p-10 border border-white/5 shadow-2xl hover:bg-[#0f172a]/50 hover:border-white/10 transition-all flex items-center justify-between group"
+                  whileHover={{ x: 8 }}
+                >
+                  <div className="flex items-center gap-8">
+                    <div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform shadow-inner border border-white/5">
+                      {icon}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-white tracking-tight mb-1">{title}</h3>
+                      <p className="text-gray-400 font-medium">{desc}</p>
+                    </div>
                   </div>
-                </Link>
-              </motion.div>
+                  <FiArrowRight className="text-3xl group-hover:translate-x-3 transition-transform" style={{ color }} />
+                </motion.div>
+              </Link>
             ))}
           </div>
 
@@ -348,7 +231,6 @@ function Dashboard() {
   );
 }
 
-// ── Live clock component ───────────────────────────────────────────────────────
 function LiveClock() {
   const [time, setTime] = useState(new Date());
   useEffect(() => {
@@ -356,15 +238,18 @@ function LiveClock() {
     return () => clearInterval(id);
   }, []);
   return (
-    <motion.div className="text-right"
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}>
-      <p className="text-xs text-gray-500">
+    <div className="text-right">
+      <p className="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest mb-1">
         {time.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}
       </p>
-      <p className="text-lg font-bold text-white font-mono tracking-wider">
-        {time.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-      </p>
-    </motion.div>
+      <div className="text-3xl font-black text-white tracking-tighter tabular-nums flex items-baseline justify-end gap-1">
+        {time.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+        <span className="text-sm text-orange-500 opacity-60 ml-0.5">{time.toLocaleTimeString("en-IN", { second: "2-digit" })}</span>
+        <span className="text-sm text-gray-500 uppercase ml-1">
+          {time.toLocaleTimeString("en-IN", { hour12: true }).slice(-2)}
+        </span>
+      </div>
+    </div>
   );
 }
 

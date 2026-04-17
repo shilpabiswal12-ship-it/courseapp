@@ -88,7 +88,7 @@ function Purchases() {
   if (!user) return null;
 
   return (
-    <div className="flex bg-white min-h-screen overflow-hidden">
+    <div className="flex bg-white text-gray-900 min-h-screen overflow-hidden">
       {/* Mobile Toggle */}
       <motion.button
         className="md:hidden fixed top-5 left-5 z-50 p-2 bg-white shadow-lg rounded-full text-2xl text-gray-800"

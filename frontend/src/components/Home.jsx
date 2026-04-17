@@ -376,6 +376,91 @@ function Home() {
           className="mt-8"
         />
 
+        {/* ── TESTIMONIALS ──────────────────────────────────── */}
+        <section className="py-24 px-6">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+              Student <span className="text-orange-500">Success Stories</span>
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Join thousands of learners who have transformed their careers with CourseHive.
+              Here is what our students have to say about their learning experience.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            {[
+              { name: "Rahul Sharma", role: "Python Developer", review: "The Python course was life-changing! The way concepts like decorators were explained made it so simple.", rating: 5, img: "https://randomuser.me/api/portraits/men/32.jpg" },
+              { name: "Ananya Iyer", role: "Full Stack Dev", review: "Incredible React content. I went from knowing nothing to building complex apps in just 4 weeks.", rating: 5, img: "https://randomuser.me/api/portraits/women/44.jpg" },
+              { name: "Vikram Singh", role: "Software Engineer", review: "Deep dive into Java was exactly what I needed. The projects were challenging and real-world oriented.", rating: 4, img: "https://randomuser.me/api/portraits/men/67.jpg" },
+              { name: "Priya Patel", role: "Frontend Lead", review: "The best platform for mastering C++. The memory management modules were exceptionally well-structured.", rating: 5, img: "https://randomuser.me/api/portraits/women/12.jpg" },
+              { name: "Amit Verma", role: "Data Scientist", review: "I learned data analysis with Python here. The support team is also very responsive to doubts.", rating: 5, img: "https://randomuser.me/api/portraits/men/45.jpg" },
+              { name: "Sneha Roy", role: "Backend Developer", review: "The Node.js masterclass was phenomenal. I finally understood how asynchronous programming works under the hood.", rating: 4, img: "https://randomuser.me/api/portraits/women/22.jpg" },
+              { name: "Arjun Gupta", role: "UI Designer", review: "Even as a designer, learning HTML/CSS basics here helped me collaborate better with developers.", rating: 5, img: "https://randomuser.me/api/portraits/men/85.jpg" },
+              { name: "Meera Das", role: "Student", review: "Started with C language. It's the perfect foundation for any beginner looking to enter tech.", rating: 5, img: "https://randomuser.me/api/portraits/women/68.jpg" },
+            ].map((review, i) => (
+              <motion.div
+                key={i}
+                variants={cardVariant}
+                whileHover={{
+                  scale: 1.05,
+                  y: -10,
+                  boxShadow: "0 0 30px rgba(249, 115, 22, 0.2)"
+                }}
+                className="glass-card p-6 rounded-3xl relative overflow-hidden group border border-white/5"
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <img
+                    src={review.img}
+                    alt={review.name}
+                    className="w-14 h-14 rounded-full border-2 border-orange-500/30 group-hover:border-orange-500 transition-colors"
+                  />
+                  <div>
+                    <h3 className="font-bold text-white text-lg leading-tight">{review.name}</h3>
+                    <p className="text-orange-500 text-xs font-medium">{review.role}</p>
+                  </div>
+                </div>
+
+                <p className="text-gray-400 text-sm leading-relaxed mb-4 italic">
+                  "{review.review}"
+                </p>
+
+                <div className="flex gap-1 text-yellow-500">
+                  {Array.from({ length: 5 }).map((_, starIdx) => (
+                    <span key={starIdx}>{starIdx < review.rating ? "★" : "☆"}</span>
+                  ))}
+                </div>
+
+                {/* Decorative element */}
+                <div className="absolute -bottom-2 -right-2 text-white/5 text-6xl font-serif pointer-events-none group-hover:text-orange-500/10 transition-colors">
+                  "
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
+
+        <motion.hr
+          initial={{ scaleX: 0, opacity: 0 }}
+          whileInView={{ scaleX: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          style={{ originX: 0 }}
+          className="mt-8"
+        />
+
         {/* ── FOOTER ─────────────────────────────────────────── */}
         <motion.footer
           className="my-8 pb-12"
@@ -422,13 +507,15 @@ function Home() {
                 <p className="mb-2">Follow Us</p>
                 <div className="flex space-x-4">
                   {[
-                    { Icon: FaFacebook, hover: "text-blue-400" },
-                    { Icon: FaInstagram, hover: "text-pink-500" },
-                    { Icon: FaTwitter, hover: "text-sky-400" },
-                  ].map(({ Icon, hover }, i) => (
+                    { Icon: FaFacebook, hover: "text-blue-400", url: "https://www.facebook.com" },
+                    { Icon: FaInstagram, hover: "text-pink-500", url: "https://www.instagram.com" },
+                    { Icon: FaTwitter, hover: "text-sky-400", url: "https://www.twitter.com" },
+                  ].map(({ Icon, hover, url }, i) => (
                     <motion.a
                       key={i}
-                      href=""
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       whileHover={{ scale: 1.3, y: -4 }}
                       whileTap={{ scale: 0.9 }}
                       transition={{ type: "spring", stiffness: 400 }}

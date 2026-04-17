@@ -13,6 +13,7 @@ import Dashboard from "./admin/Dashboard";
 import CourseCreate from "./admin/CourseCreate";
 import UpdateCourse from "./admin/UpdateCourse";
 import OurCourses from "./admin/OurCourses";
+import ManageUsers from "./admin/ManageUsers";
 
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
         <Route path="/admin/create-course" element={<CourseCreate />} />
         <Route path="/admin/update-course/:id" element={<UpdateCourse />} />
         <Route path="/admin/our-courses" element={<OurCourses />} />
+        <Route path="/admin/manage-users" element={<ManageUsers />} />
 
       </Routes>
       <Toaster />

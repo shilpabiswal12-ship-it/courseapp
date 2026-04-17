@@ -92,7 +92,7 @@ function Courses() {
   );
 
   return (
-    <div className="flex bg-white overflow-hidden min-h-screen">
+    <div className="flex bg-white text-gray-900 overflow-hidden min-h-screen">
       {/* Hamburger for mobile */}
       <motion.button
         className="md:hidden fixed top-5 left-5 z-50 p-2 bg-white shadow-lg rounded-full text-2xl text-gray-800"
@@ -193,7 +193,7 @@ function Courses() {
                 placeholder="Search for anything..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-100/50 border border-transparent rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-300 text-sm"
+                className="w-full pl-12 pr-4 py-3 bg-gray-100/50 border border-transparent rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all duration-300 text-sm text-gray-900"
               />
             </motion.div>
 

@@ -3,6 +3,8 @@ import axios from "axios";
 import logo from "../../public/logo.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
+import { motion } from "framer-motion";
+
 
 
 function Login() {
@@ -49,51 +51,72 @@ function Login() {
 
 
   return (
-    <div className='bg-gradient-to-r from-black to-blue-950'>
-      <div className="h-screen container mx-auto flex items-center justify-center text-white">
-        <header className="absolute top-0 left-0 w-full flex justify-between items-center p-5 ">
-          <div className="flex items-center space-x-2">
-            <img src={logo} alt="logo" className="w-12 h-12 rounded-full" />
-            <Link to={"/"} className="text-xl font-bold text-orange-500">
-              CourseHive
+    <div className='relative min-h-screen bg-[#f8fafc] overflow-hidden'>
+      <div className="animated-bg" />
+      
+      <div className="min-h-screen container mx-auto flex items-center justify-center text-[#0f172a] px-4">
+        <header className="absolute top-0 left-0 w-full flex justify-between items-center p-6 md:p-10">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center space-x-3"
+          >
+            <img src={logo} alt="logo" className="w-12 h-12 rounded-2xl shadow-lg shadow-orange-500/10" />
+            <Link to={"/"} className="text-2xl font-black text-[#0f172a] tracking-tight">
+              Course<span className="text-orange-500">Hive</span>
             </Link>
-          </div>
-          <div className="flex items-center space-x-4">
+          </motion.div>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center space-x-4"
+          >
             <Link to={"/signup"}
-              className="bg-transparent border border-gray-500 py-2 px-4 rounded-md">
+              className="font-bold text-sm text-slate-600 hover:text-slate-900 transition-colors">
               Signup
             </Link>
             <Link to={"/courses"}
-              className="bg-orange-500 py-2 px-4 rounded-md">
-              Join Now
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-orange-500/20 transition-all text-sm">
+              Explore
             </Link>
-          </div>
+          </motion.div>
         </header>
-        <div className="bg-gray-900 p-8 rounded-lg shadow-lg w-[500px] mt-20">
-          <h2 className="text-2xl font-bold mb-4 text-center ">
-            Welcome to <span className="text-orange-500"> CourseHive</span>
-          </h2>
-          <p className="text-center text-gray-400 mb-6">
-            Login in to access paid content!
-          </p>
 
-          <form onSubmit={handleSubmit}>
+        <motion.div 
+          initial={{ opacity: 0, y: 30, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="glass-card p-8 md:p-12 rounded-[2.5rem] shadow-2xl w-full max-w-[480px] mt-10 relative overflow-hidden bg-white/70 backdrop-blur-2xl border border-white"
+        >
+          {/* Subtle glow artifact */}
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="mb-4">
-              <label htmlFor="email" className=" text-gray-400 mb-2">
-                Email
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-black mb-2 text-slate-900 tracking-tight">
+              Welcome Back
+            </h2>
+            <p className="text-slate-500 font-medium text-sm leading-relaxed">
+              Log in to your account to continue your learning journey.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+                Email Address
               </label>
               <input
-                type="text"
+                type="email"
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-3 rounded-md bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500"
+                className="w-full p-4 rounded-2xl bg-white border border-slate-200 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all outline-none text-slate-900 shadow-sm"
                 placeholder="name@email.com"
                 required />
             </div>
-            <div className="mb-4">
-              <label htmlFor="password" className=" text-gray-400 mb-2">
+
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
                 Password
               </label>
               <div className="relative">
@@ -102,31 +125,42 @@ function Login() {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full p-3 rounded-md bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500"
-                  placeholder="********"
+                  className="w-full p-4 rounded-2xl bg-white border border-slate-200 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all outline-none text-slate-900 shadow-sm"
+                  placeholder="••••••••"
                   required />
-                <span className="absolute right-3 top-3 text-gray-500 cursor-pointer">
-                  👁️
-                </span>
               </div>
             </div>
+
             {errorMessage && (
-              <div className="mb-4 text-red-500 text-center">
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="text-red-600 text-sm font-bold bg-red-50 p-3 rounded-xl border border-red-100 text-center"
+              >
                 {errorMessage}
-              </div>
-            )
+              </motion.div>
+            )}
 
-            }
-
-            <button type="Submit"
-              className="w-full bg-orange-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md transition">
-              Login
-            </button>
+            <motion.button 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="Submit"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 px-6 rounded-2xl shadow-xl shadow-orange-500/20 transition-all text-base tracking-tight"
+            >
+              Log In
+            </motion.button>
           </form>
-        </div>
 
+          <div className="mt-8 pt-8 border-t border-slate-100 text-center">
+            <p className="text-slate-500 text-sm font-medium">
+              Don't have an account? {" "}
+              <Link to="/signup" className="text-orange-600 font-black hover:underline underline-offset-4">
+                Create one for free
+              </Link>
+            </p>
+          </div>
+        </motion.div>
       </div>
-
     </div>
   );
 }
