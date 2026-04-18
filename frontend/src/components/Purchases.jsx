@@ -42,6 +42,10 @@ function Purchases() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [completedCourses, setCompletedCourses] = useState(() => {
+    const saved = localStorage.getItem("course_progress");
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const navigate = useNavigate();
   const userStr = localStorage.getItem("user");
@@ -84,6 +88,26 @@ function Purchases() {
   };
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const toggleCompletion = (courseId) => {
+    const isCompleted = completedCourses.includes(courseId);
+    let updated;
+    if (isCompleted) {
+      updated = completedCourses.filter((id) => id !== courseId);
+      toast.error("Marked as In Progress");
+    } else {
+      updated = [...completedCourses, courseId];
+      toast.success("Course Completed! 🎉");
+    }
+    setCompletedCourses(updated);
+    localStorage.setItem("course_progress", JSON.stringify(updated));
+  };
+
+  // Filter completedCourses to only include those that are actually in the purchases list
+  const validCompletedCount = purchases.filter(p => completedCourses.includes(p._id)).length;
+  const progressPercentage = purchases.length > 0
+    ? Math.round((validCompletedCount / purchases.length) * 100)
+    : 0;
 
   if (!user) return null;
 
@@ -159,6 +183,27 @@ function Purchases() {
           >
             <h1 className="text-3xl font-black text-gray-900">My Learning</h1>
             <p className="text-gray-400 text-sm mt-1">Review all your purchased courses and continue learning.</p>
+
+            {/* Progress Bar */}
+            {purchases.length > 0 && (
+              <div className="mt-8 bg-gray-50 p-6 rounded-3xl border border-gray-100 max-w-2xl">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-sm font-bold text-gray-700">Total Progress</span>
+                  <span className="text-blue-600 font-black text-sm">{progressPercentage}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercentage}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="bg-blue-600 h-full rounded-full shadow-sm"
+                  />
+                </div>
+                <p className="text-[10px] text-gray-400 mt-2 font-medium">
+                  {validCompletedCount} of {purchases.length} courses completed
+                </p>
+              </div>
+            )}
           </motion.div>
         </header>
 
@@ -221,24 +266,48 @@ function Purchases() {
                     <span className="text-blue-600 font-black text-sm">
                       ₹{purchase.price}
                     </span>
-                    <span className="bg-green-50 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded-md">
-                      Purchased
-                    </span>
+                    <div className="flex gap-2">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                        completedCourses.includes(purchase._id) 
+                          ? "bg-blue-50 text-blue-600" 
+                          : "bg-orange-50 text-orange-600"
+                      }`}>
+                        {completedCourses.includes(purchase._id) ? "Completed" : "In Progress"}
+                      </span>
+                      <span className="bg-green-50 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                        Purchased
+                      </span>
+                    </div>
                   </div>
 
-                  <Link
-                    to={purchase.youtubeLink}
-                    target="_blank"
-                    className="mt-4"
-                  >
-                    <motion.button
-                      whileHover={{ scale: 1.02, backgroundColor: "#2563eb" }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full bg-blue-600 text-white py-3 rounded-2xl font-black text-sm shadow-md shadow-blue-500/10 flex items-center justify-center gap-2"
+                  <div className="flex flex-col gap-2 mt-4">
+                    <Link
+                      to={purchase.youtubeLink}
+                      target="_blank"
+                      className="w-full"
                     >
-                      <FiPlayCircle /> Watch Course
+                      <motion.button
+                        whileHover={{ scale: 1.02, backgroundColor: "#2563eb" }}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full bg-blue-600 text-white py-3 rounded-2xl font-black text-sm shadow-md shadow-blue-500/10 flex items-center justify-center gap-2"
+                      >
+                        <FiPlayCircle /> Watch Course
+                      </motion.button>
+                    </Link>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => toggleCompletion(purchase._id)}
+                      className={`w-full py-3 rounded-2xl font-black text-sm border-2 transition-colors ${
+                        completedCourses.includes(purchase._id)
+                          ? "border-blue-100 bg-blue-50 text-blue-600 hover:bg-blue-100"
+                          : "border-gray-100 bg-white text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      {completedCourses.includes(purchase._id) ? "Mark as In Progress" : "Mark as Completed"}
                     </motion.button>
-                  </Link>
+                  </div>
                 </div>
               </motion.div>
             ))}
