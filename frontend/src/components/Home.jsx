@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import logo from "../../public/logo.jpg";
 import coursehiveLogo from "../../public/coursehive_logo.png";
 import { Link } from "react-router-dom";
-import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaTwitter, FaChalkboardTeacher, FaClock, FaWallet, FaCertificate } from "react-icons/fa";
 import axios from "axios";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -69,6 +69,32 @@ const particles = Array.from({ length: 18 }, (_, i) => ({
   duration: Math.random() * 4 + 3,
   delay: Math.random() * 4,
 }));
+
+// ── stat counter component ──────────────────────────────────────────────
+function StatCounter({ target }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const end = parseInt(target);
+    const duration = 2000;
+    const increment = end / (duration / 16);
+
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [target]);
+
+  return <span>{count}</span>;
+}
 
 // ── component ────────────────────────────────────────────────────────────────
 function Home() {
@@ -460,6 +486,146 @@ function Home() {
           style={{ originX: 0 }}
           className="mt-8"
         />
+
+        {/* ── STATS SECTION ─────────────────────────────────── */}
+        <section className="py-24 px-6 relative z-10">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            {[
+              { label: "Total Students", value: 500, suffix: "+" },
+              { label: "Total Courses", value: 50, suffix: "+" },
+              { label: "Total Enrollments", value: 1000, suffix: "+" },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                variants={cardVariant}
+                whileHover={{
+                  y: -12,
+                  boxShadow: "0 25px 50px -12px rgba(249, 115, 22, 0.15)",
+                  borderColor: "rgba(249, 115, 22, 0.3)"
+                }}
+                className="bg-white/5 backdrop-blur-md border border-white/5 p-10 rounded-[2.5rem] text-center group transition-colors duration-500 hover:bg-white/[0.08]"
+              >
+                <h3 className="text-gray-400 font-bold uppercase tracking-widest text-xs mb-4 group-hover:text-orange-500 transition-colors">
+                  {stat.label}
+                </h3>
+                <div className="text-6xl font-black text-white flex justify-center items-center gap-1 tabular-nums">
+                  <StatCounter target={stat.value} />
+                  <motion.span
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5, type: "spring" }}
+                    className="text-orange-500"
+                  >
+                    {stat.suffix}
+                  </motion.span>
+                </div>
+                <div className="mt-4 h-1 w-12 bg-orange-500/20 rounded-full mx-auto group-hover:w-20 group-hover:bg-orange-500 transition-all duration-500" />
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
+
+        <motion.hr
+          initial={{ scaleX: 0, opacity: 0 }}
+          whileInView={{ scaleX: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          style={{ originX: 0 }}
+          className="mt-8"
+        />
+
+        {/* ── WHY CHOOSE US SECTION ─────────────────────────── */}
+        <section className="py-24 px-6 relative z-10 overflow-hidden">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+              Why <span className="text-orange-500">Choose Us?</span>
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              We provide the best learning environment and resources to help you achieve your goals professionally.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            {[
+              { 
+                Icon: FaChalkboardTeacher, 
+                title: "Expert Instructors", 
+                desc: "Learn from industry professionals with years of real-world experience." 
+              },
+              { 
+                Icon: FaClock, 
+                title: "Lifetime Access", 
+                desc: "Get unlimited access to your courses anytime, anywhere, forever." 
+              },
+              { 
+                Icon: FaWallet, 
+                title: "Affordable Pricing", 
+                desc: "High-quality education at prices that fit your budget perfectly." 
+              },
+              { 
+                Icon: FaCertificate, 
+                title: "Certification", 
+                desc: "Earn a recognized certificate to boost your resume and career." 
+              },
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                variants={cardVariant}
+                whileHover={{ 
+                  scale: 1.05, 
+                  y: -10,
+                  boxShadow: "0 0 40px rgba(249, 115, 22, 0.1)" 
+                }}
+                className="bg-gray-900 shadow-2xl p-8 rounded-[2rem] border border-white/5 group hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden"
+              >
+                {/* Background glow */}
+                <div className="absolute -top-10 -right-10 w-24 h-24 bg-orange-500/10 blur-3xl rounded-full group-hover:bg-orange-500/20 transition-colors" />
+                
+                <div className="bg-orange-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border border-orange-500/20 group-hover:bg-orange-500 group-hover:scale-110 transition-all duration-300">
+                  <feature.Icon className="text-orange-500 text-3xl group-hover:text-white transition-colors" />
+                </div>
+                
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-orange-500 transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300 transition-colors">
+                  {feature.desc}
+                </p>
+
+                {/* Decorative bar */}
+                <div className="mt-6 h-0.5 w-8 bg-orange-500 rounded-full group-hover:w-full transition-all duration-500" />
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
+
+        <motion.hr
+          initial={{ scaleX: 0, opacity: 0 }}
+          whileInView={{ scaleX: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          style={{ originX: 0 }}
+          className="mt-8"
+        />
+
 
         {/* ── FOOTER ─────────────────────────────────────────── */}
         <motion.footer

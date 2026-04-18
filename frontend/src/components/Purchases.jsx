@@ -1,13 +1,14 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { FaDiscourse, FaDownload } from "react-icons/fa";
+import { FaDiscourse, FaDownload, FaCertificate } from "react-icons/fa";
 import { IoLogIn, IoLogOut } from "react-icons/io5";
 import { RiHome2Fill } from "react-icons/ri";
 import { HiMenu, HiX } from "react-icons/hi";
 import { FiPlayCircle, FiArrowRight } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { jsPDF } from "jspdf";
 import logo from "../../public/logo.jpg";
 
 const BACKEND_URL = "http://localhost:4001/api/v1";
@@ -101,6 +102,85 @@ function Purchases() {
     }
     setCompletedCourses(updated);
     localStorage.setItem("course_progress", JSON.stringify(updated));
+  };
+
+  const generateCertificate = (courseTitle) => {
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
+
+    // ── Certificate Design ──
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Background
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, pageWidth, pageHeight, "F");
+
+    // Decorative Borders
+    doc.setDrawColor(37, 99, 235); // Blue-600
+    doc.setLineWidth(5);
+    doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
+
+    doc.setDrawColor(249, 115, 22); // Orange-500
+    doc.setLineWidth(1);
+    doc.rect(15, 15, pageWidth - 30, pageHeight - 30);
+
+    // Header Text
+    doc.setTextColor(30, 41, 59);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(48);
+    doc.text("CERTIFICATE", pageWidth / 2, 60, { align: "center" });
+    
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "normal");
+    doc.text("OF COMPLETION", pageWidth / 2, 75, { align: "center" });
+
+    // Body
+    doc.setFontSize(18);
+    doc.text("This is to certify that", pageWidth / 2, 100, { align: "center" });
+
+    // Recipient Name
+    console.log("Certificate Generation - Current User Data:", user);
+    
+    const firstName = user?.firstName || user?.user?.firstName || "";
+    const lastName = user?.lastName || user?.user?.lastName || "";
+    const recipientName = (firstName || lastName) ? `${firstName} ${lastName}`.trim() : "Learner";
+    
+    console.log("Extracted Name for Certificate:", recipientName);
+
+    doc.setTextColor(37, 99, 235);
+    doc.setFontSize(36);
+    doc.setFont("helvetica", "bolditalic");
+    doc.text(recipientName, pageWidth / 2, 120, { align: "center" });
+
+    // Achievement
+    doc.setTextColor(30, 41, 59);
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "normal");
+    doc.text("has successfully completed the professional course", pageWidth / 2, 140, { align: "center" });
+
+    // Course Title
+    doc.setTextColor(249, 115, 22);
+    doc.setFontSize(26);
+    doc.setFont("helvetica", "bold");
+    doc.text(courseTitle, pageWidth / 2, 155, { align: "center" });
+
+    // Footer Info
+    const date = new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(14);
+    doc.text(`Completed on ${date}`, pageWidth / 2, 175, { align: "center" });
+
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("CourseHive Academy", pageWidth / 2, 190, { align: "center" });
+
+    // Save
+    doc.save(`${courseTitle.replace(/\s+/g, '_')}_Certificate.pdf`);
+    toast.success("Certificate downloaded! Congratulations! 🎓");
   };
 
   // Filter completedCourses to only include those that are actually in the purchases list
@@ -307,6 +387,17 @@ function Purchases() {
                     >
                       {completedCourses.includes(purchase._id) ? "Mark as In Progress" : "Mark as Completed"}
                     </motion.button>
+
+                    {completedCourses.includes(purchase._id) && (
+                      <motion.button
+                        whileHover={{ scale: 1.02, backgroundColor: "#0f172a" }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => generateCertificate(purchase.title)}
+                        className="w-full bg-slate-800 text-white py-3 rounded-2xl font-black text-sm shadow-md flex items-center justify-center gap-2"
+                      >
+                        <FaCertificate className="text-orange-500" /> Download Certificate
+                      </motion.button>
+                    )}
                   </div>
                 </div>
               </motion.div>
