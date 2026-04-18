@@ -3,37 +3,55 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiUsers, FiTrash2, FiSearch, FiArrowLeft, FiUserCheck, FiMail } from "react-icons/fi";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 const pageVariant = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
+const BACKEND_URL = "http://localhost:4001/api/v1/admin";
+
 function ManageUsers() {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // Admin authentication check (matching existing pattern in Dashboard/OurCourses)
   useEffect(() => {
     const adminStr = localStorage.getItem("admin");
     const admin = adminStr && adminStr !== "undefined" ? JSON.parse(adminStr) : null;
     if (!admin) {
       toast.error("Please login to admin dashboard");
       navigate("/admin/login");
+      return;
     }
+
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem("adminToken");
+        const response = await axios.get(`${BACKEND_URL}/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
+        setUsers(response.data.users || []);
+        console.log("Fetched users:", response.data.users);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        toast.error("Failed to fetch users from system");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
   }, [navigate]);
 
-  useEffect(() => {
-    const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
-    setUsers(storedUsers);
-  }, []);
-
   const deleteUser = (email) => {
+    // Note: In a real system, you'd call a backend delete endpoint here
     const updatedUsers = users.filter((user) => user.email !== email);
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
     setUsers(updatedUsers);
-    toast.success("User deleted successfully!");
+    toast.success("User removed from view (Backend delete not yet implemented)!");
   };
 
   const filteredUsers = users.filter(
@@ -97,18 +115,27 @@ function ManageUsers() {
 
       {/* ── Users Table ── */}
       <div className="rounded-[2rem] overflow-hidden border border-white/5 bg-[#0f172a]/30 backdrop-blur-xl shadow-2xl relative">
-        {filteredUsers.length === 0 ? (
+        {loading ? (
+          <div className="py-24 flex flex-col items-center justify-center text-center gap-4">
+            <motion.div
+              className="w-12 h-12 border-4 border-orange-500/20 border-t-orange-500 rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
+            <p className="text-gray-400 font-medium animate-pulse">Synchronizing user database...</p>
+          </div>
+        ) : filteredUsers.length === 0 ? (
           <div className="py-24 flex flex-col items-center justify-center text-center">
             <div className="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center text-4xl mb-6">
               {searchTerm ? "🔍" : "📫"}
             </div>
             <h3 className="text-2xl font-black text-white tracking-tight">
-              {searchTerm ? "No results found" : "User database is empty"}
+              {searchTerm ? "No results found" : "No registered students"}
             </h3>
             <p className="text-gray-400 mt-2 max-w-xs mx-auto">
               {searchTerm 
                 ? `We couldn't find any users matching "${searchTerm}". Try a different term.`
-                : "No student registrations found in LocalStorage."}
+                : "It looks like there are no registered students in the system yet."}
             </p>
             {!searchTerm && (
               <Link to="/admin/dashboard">

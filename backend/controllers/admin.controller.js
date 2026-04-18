@@ -102,3 +102,19 @@ export const logout = (req, res) => {
     }
     
 };
+
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({});
+        // Map to match the frontend expectations (firstName + lastName as name)
+        const formattedUsers = users.map(user => ({
+            name: `${user.firstName} ${user.lastName}`,
+            email: user.email,
+            role: "Student" // default role
+        }));
+        res.status(200).json({ users: formattedUsers });
+    } catch (error) {
+        res.status(500).json({ errors: "Error in fetching users" });
+        console.log("Error in fetching users", error);
+    }
+};
