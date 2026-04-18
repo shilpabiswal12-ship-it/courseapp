@@ -100,6 +100,7 @@ function Dashboard() {
           {[
             { to: "/admin/our-courses", label: "Our Courses", Icon: FiGrid },
             { to: "/admin/create-course", label: "Create Course", Icon: FiPlusSquare },
+            { to: "/admin/manage-users", label: "Manage Users", Icon: FiUsers },
             { to: "/", label: "Home", Icon: FiHome },
           ].map(({ to, label, Icon }) => (
             <Link key={to} to={to} onClick={() => setActiveNav(to)}>
